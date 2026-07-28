@@ -837,9 +837,10 @@ function FooterSection() {
           <span className="font-display text-sm font-semibold text-white">Orca Enclave</span>
         </div>
         <p className="text-xs text-white/50">©2026 All rights reserved</p>
-        <div className="flex gap-6">
+        <div className="flex items-center gap-6">
           <a href="#" className="text-xs text-white/50 no-underline hover:text-[#FF80B0] transition-colors">Privacy Policy</a>
           <a href="#" className="text-xs text-white/50 no-underline hover:text-[#FF80B0] transition-colors">Terms of Use</a>
+          <span className="text-[10px] text-white/30 tracking-[0.15em] uppercase">Made by Orqo Labs</span>
         </div>
       </div>
     </footer>
