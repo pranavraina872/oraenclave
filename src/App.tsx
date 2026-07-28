@@ -140,6 +140,7 @@ export default function App() {
   const [exitEntry, setExitEntry] = useState(false)
   const [showContent, setShowContent] = useState(false)
   const [isNight, setIsNight] = useState(false)
+  const [is404, setIs404] = useState(false)
 
   useEffect(() => {
     history.scrollRestoration = 'manual'
@@ -148,12 +149,19 @@ export default function App() {
     window.addEventListener('scroll', onScroll)
     const t1 = setTimeout(() => setExitEntry(true), 2000)
     const t2 = setTimeout(() => setShowContent(true), 3000)
+
+    if (window.location.pathname !== '/' && window.location.pathname !== '') {
+      setIs404(true)
+    }
+
     return () => {
       history.scrollRestoration = 'auto'
       window.removeEventListener('scroll', onScroll)
       clearTimeout(t1); clearTimeout(t2)
     }
   }, [])
+
+  if (is404) return <NotFoundPage />
 
   return (
     <>
@@ -188,6 +196,51 @@ export default function App() {
         <FooterSection />
       </div>
     </>
+  )
+}
+
+/* ─── 404 ─── */
+function NotFoundPage() {
+  const [phase, setPhase] = useState(0)
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase(1), 200)
+    const t2 = setTimeout(() => setPhase(2), 600)
+    const t3 = setTimeout(() => setPhase(3), 1000)
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+  }, [])
+
+  return (
+    <div className="relative min-h-screen bg-[#1A1A1A] flex items-center justify-center overflow-hidden">
+      <div className="absolute w-[60vmin] h-[60vmin] rounded-full bg-[#FF80B0]/5 blur-[120px] top-[5%] -left-[10%] pointer-events-none" />
+      <div className="absolute w-[40vmin] h-[40vmin] rounded-full bg-[#C2185B]/8 blur-[100px] bottom-0 right-[5%] pointer-events-none" />
+      <div className="absolute w-[80vmin] h-[30vmin] rounded-[50%] border border-[#FF80B0]/10 pointer-events-none"
+        style={{ animation: 'spin 20s linear infinite', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }} />
+      <div className="absolute w-[60vmin] h-[22vmin] rounded-[50%] border border-[#C2185B]/10 pointer-events-none"
+        style={{ animation: 'spin 25s linear infinite reverse', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }} />
+
+      <div className="relative z-10 text-center px-8">
+        <div className={`transition-all duration-700 ${phase >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+          <LogoIcon size={48} className="text-[#FF80B0] mx-auto mb-8" />
+        </div>
+        <div className={`transition-all duration-700 delay-300 ${phase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+          <h1 className="font-display text-[clamp(80px,20vw,140px)] font-bold leading-none mb-2 text-transparent bg-clip-text bg-gradient-to-br from-[#FF80B0] via-[#C2185B] to-[#FF80B0]">
+            404
+          </h1>
+        </div>
+        <div className={`transition-all duration-700 delay-500 ${phase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <p className="text-sm text-white/50 max-w-sm mx-auto mb-10 leading-relaxed tracking-wide">
+            The page you are looking for has drifted out to sea.
+          </p>
+        </div>
+        <div className={`transition-all duration-700 delay-700 ${phase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <a href="/"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#FF80B0] to-[#C2185B] text-white px-10 py-4 text-xs font-bold uppercase tracking-[0.15em] no-underline rounded-sm hover:from-[#C2185B] hover:to-[#800040] transition-all duration-500 shadow-lg shadow-[#FF80B0]/20 hover:shadow-xl hover:gap-4">
+            Back to shore
+          </a>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -303,6 +356,8 @@ function HeroSection({ isNight, setNight, setDay }: { isNight: boolean; setNight
   const { ref: imgRef, offset } = useParallax(0.25)
   return (
     <section className="relative h-dvh min-h-[600px] overflow-hidden bg-black">
+      {/* Subtle pattern overlay */}
+      <div className="absolute inset-0 z-[5] opacity-[0.04] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
       <div ref={imgRef} className="absolute inset-0" style={{ transform: `translateY(${offset}px)` }}>
         <div className={`absolute inset-0 z-10 transition-opacity duration-1000 ${isNight ? 'bg-gradient-to-t from-black/60 via-black/20 to-black/90' : 'bg-gradient-to-r from-black/50 via-black/10 to-transparent'}`} />
         <img
@@ -394,6 +449,8 @@ function AboutSection() {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white">
+      {/* Subtle diagonal pattern */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40L40 0z' stroke='%23800040' stroke-width='0.5' fill='none'/%3E%3C/svg%3E")` }} />
       {/* Pink entry overlay (shrinks to reveal content) */}
       <div
         className={`absolute inset-0 z-30 transition-all duration-[0.8s] ease-out ${revealed ? 'opacity-0 scale-105' : ''}`}
@@ -487,15 +544,18 @@ function ResidencesSection() {
   const { ref, visible } = useScrollReveal()
 
   return (
-    <section id="residence" ref={ref} className="py-32 md:py-44 px-8 md:px-16 lg:px-24 bg-gradient-to-b from-white to-[#FAF8F5]">
-      <div className="max-w-[1400px] mx-auto">
+    <section id="residence" ref={ref} className="relative py-32 md:py-44 px-8 md:px-16 lg:px-24 bg-gradient-to-b from-white to-[#FAF8F5]">
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40L40 0z' stroke='%23800040' stroke-width='0.5' fill='none'/%3E%3C/svg%3E")` }} />
+      <div className="absolute top-0 left-1/4 w-[30vw] h-[30vw] rounded-full bg-[#800040]/[0.02] blur-[100px] pointer-events-none" />
+      <div className="max-w-[1400px] mx-auto relative z-10">
         <div className={`text-center mb-20 transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="flex items-center justify-center gap-3 mb-5">
-            <span className="w-8 h-[1px] bg-[#800040]/40" />
+          <div className="flex items-center justify-center gap-4 mb-5">
+            <span className="w-8 h-[1px] bg-gradient-to-r from-transparent via-[#800040]/60 to-transparent" />
             <p className="text-xs uppercase tracking-[0.2em] text-[#800040]/60 font-medium">Residences</p>
-            <span className="w-8 h-[1px] bg-[#800040]/40" />
+            <span className="w-8 h-[1px] bg-gradient-to-r from-transparent via-[#800040]/60 to-transparent" />
           </div>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight text-[#800040]">Select an Apartment</h2>
+          <div className="w-12 h-[1px] bg-gradient-to-r from-transparent via-[#800040]/40 to-transparent mx-auto mt-5" />
         </div>
         <div className="grid md:grid-cols-3 gap-8 md:gap-10">
           {apartments.map((apt, i) => (
@@ -512,28 +572,30 @@ function AptCard({ apt, img, index, visible }: { apt: typeof apartments[0]; img:
 
   return (
     <div
-      className="group cursor-pointer transition-all duration-700"
+      className="group cursor-pointer transition-all duration-700 hover:-translate-y-1"
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(40px)',
         transitionDelay: `${delay}ms`,
       }}
     >
-      <div className="aspect-[4/3] overflow-hidden bg-[#F5F0EB] mb-8 relative">
+      <div className="relative aspect-[4/3] overflow-hidden bg-[#F5F0EB] mb-8 rounded-sm shadow-sm group-hover:shadow-xl transition-shadow duration-700">
         <div className="absolute inset-0 bg-gradient-to-t from-[#800040]/40 via-transparent to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <img src={img} alt={apt.type}
-          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105" />
+          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 brightness-95 group-hover:brightness-100" />
+        <div className="absolute inset-0 ring-1 ring-[#800040]/10 group-hover:ring-[#800040]/20 rounded-sm pointer-events-none transition-all duration-500" />
         <div className="absolute bottom-4 left-4 z-20 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-3 group-hover:translate-y-0">
-          <span className="bg-[#FF80B0] text-[#800040] text-[10px] font-semibold uppercase tracking-widest px-3 py-1.5">{apt.beds} Bedrooms</span>
+          <span className="bg-gradient-to-r from-[#FF80B0] to-[#C2185B] text-white text-[10px] font-semibold uppercase tracking-widest px-3 py-1.5 shadow-lg">{apt.beds} Bedrooms</span>
         </div>
       </div>
       <p className="text-xs uppercase tracking-[0.12em] text-[#8B8070] mb-3">{apt.beds} Bedrooms</p>
-      <h3 className="font-display text-xl font-semibold mb-3 text-[#800040]">{apt.type}</h3>
-      <p className="text-sm text-[#8B8070] mb-2">{apt.size}</p>
+      <h3 className="font-display text-xl font-semibold mb-3 text-[#800040] group-hover:text-[#C2185B] transition-colors duration-500">{apt.type}</h3>
+      <div className="w-8 h-[1px] bg-gradient-to-r from-[#800040]/40 to-transparent mb-3" />
+      <p className="text-sm text-[#8B8070] mb-2 font-medium">{apt.size}</p>
       <p className="text-sm text-[#8B8070] mb-6 leading-relaxed">{apt.desc}</p>
       <a href="#contact"
-        className="text-xs uppercase tracking-[0.12em] text-[#800040] no-underline border-b border-[#800040]/40 pb-0.5 hover:text-[#C2185B] hover:border-[#C2185B] transition-all inline-flex items-center gap-1.5">
-        Explore <span className="group-hover:translate-x-1 transition-transform">→</span>
+        className="text-xs uppercase tracking-[0.12em] text-[#800040] no-underline border-b border-[#800040]/40 pb-0.5 hover:text-[#C2185B] hover:border-[#C2185B] transition-all inline-flex items-center gap-1.5 group/link">
+        Explore <span className="group-hover/link:translate-x-1 transition-transform">→</span>
       </a>
     </div>
   )
@@ -571,24 +633,25 @@ function AmenitiesSection() {
             {amenities.map((a, i) => (
               <div
                 key={i}
-                className="group relative bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.15] transition-all duration-700 overflow-hidden shrink-0"
-                style={{ width: '55%', minWidth: '480px', height: '420px' }}
+                className="group relative bg-white/[0.03] border border-white/[0.06] hover:border-[#FF80B0]/20 transition-all duration-700 overflow-hidden shrink-0"
+                style={{ width: '65%', minWidth: '520px', height: '550px' }}
               >
                 <img src={a.img} alt={a.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A] via-[#1A1A1A]/70 to-transparent transition-opacity duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/[0.06] to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center" />
+                  className="absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-110 brightness-[0.85] group-hover:brightness-100" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A] via-[#1A1A1A]/40 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#FF80B0]/30 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center pointer-events-none" />
                 <div className="relative z-10 h-full flex flex-col justify-end p-10 md:p-12">
-                  <div className="w-10 h-10 rounded-lg bg-white/[0.06] border border-white/[0.08] flex items-center justify-center mb-4 group-hover:bg-white/[0.1] group-hover:border-[#FF80B0]/30 transition-all duration-500">
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 text-[#FF80B0]/80 group-hover:text-[#FF80B0] transition-colors duration-500" fill="currentColor">
+                  <div className="w-12 h-12 rounded-xl bg-white/[0.08] border border-white/[0.1] backdrop-blur-sm flex items-center justify-center mb-5 group-hover:bg-[#FF80B0]/15 group-hover:border-[#FF80B0]/40 transition-all duration-500">
+                    <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#FF80B0] transition-colors duration-500" fill="currentColor">
                       <path d={a.icon} />
                     </svg>
                   </div>
-                  <h3 className="font-display text-2xl md:text-3xl font-semibold text-white mb-3 group-hover:text-[#FF80B0] transition-colors duration-500">
+                  <h3 className="font-display text-2xl md:text-3xl font-semibold text-white mb-3 group-hover:text-[#FF80B0] transition-colors duration-500 drop-shadow-lg">
                     {a.title}
                   </h3>
-                  <p className="text-sm text-white/50 leading-relaxed max-w-md group-hover:text-white/70 transition-colors duration-500">
+                  <div className="w-10 h-[2px] bg-gradient-to-r from-[#FF80B0]/60 to-transparent mb-4" />
+                  <p className="text-sm text-white/60 leading-relaxed max-w-md group-hover:text-white/80 transition-colors duration-500 drop-shadow-md">
                     {a.desc}
                   </p>
                 </div>
@@ -607,27 +670,34 @@ function LocationSection() {
   const { ref: imgRef, offset } = useParallax(0.2)
 
   return (
-    <section ref={ref} className="py-32 md:py-44 px-8 md:px-16 lg:px-24 bg-gradient-to-b from-white to-[#FAF8F5]">
-      <div className="max-w-[1400px] mx-auto">
+    <section ref={ref} className="relative py-32 md:py-44 px-8 md:px-16 lg:px-24 bg-gradient-to-b from-white to-[#FAF8F5]">
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40L40 0z' stroke='%23800040' stroke-width='0.5' fill='none'/%3E%3C/svg%3E")` }} />
+      <div className="absolute bottom-0 right-1/4 w-[25vw] h-[25vw] rounded-full bg-[#800040]/[0.02] blur-[80px] pointer-events-none" />
+      <div className="max-w-[1400px] mx-auto relative z-10">
         <div className={`grid md:grid-cols-2 gap-16 md:gap-24 items-center transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div ref={imgRef} className={`order-2 md:order-1 relative group transition-all duration-1000 delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="aspect-[4/3] bg-[#F5F0EB] overflow-hidden">
-              <div className="absolute inset-0 bg-[#800040]/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="aspect-[4/3] bg-[#F5F0EB] overflow-hidden shadow-lg group-hover:shadow-2xl transition-shadow duration-700">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#800040]/30 via-transparent to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 ring-1 ring-[#800040]/10 group-hover:ring-[#800040]/20 pointer-events-none transition-all duration-500" />
               <div className="w-full h-full group-hover:scale-105 transition-transform duration-700">
                 <img src="https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=800&q=80" alt="Malibu Coast"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover brightness-95"
                   style={{ transform: visible ? `translateY(0) scale(1)` : `translateY(${offset * 0.15}px) scale(1.08)` }} />
               </div>
             </div>
           </div>
           <div className={`order-1 md:order-2 max-w-lg transition-all duration-1000 delay-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <p className="text-xs uppercase tracking-[0.2em] text-[#800040]/60 font-medium mb-5">Location</p>
+            <div className="flex items-center gap-3 mb-5">
+              <span className="w-6 h-[1px] bg-gradient-to-r from-transparent via-[#800040]/60 to-transparent" />
+              <p className="text-xs uppercase tracking-[0.2em] text-[#800040]/60 font-medium">Location</p>
+            </div>
             <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold leading-[1.1] tracking-tight mb-8 text-[#800040]">
               Pacific Coast<br />Malibu & Santa Monica
             </h2>
-            <p className="text-[#8B8070] leading-relaxed mb-6 text-sm md:text-base">                Surrounded by pristine beaches, coastal trails, and world-class wellness destinations.</p>
+            <div className="w-12 h-[1px] bg-gradient-to-r from-transparent via-[#800040]/30 to-transparent mb-8" />
+            <p className="text-[#8B8070] leading-relaxed mb-6 text-sm md:text-base">Surrounded by pristine beaches, coastal trails, and world-class wellness destinations.</p>
             <p className="text-[#8B8070] leading-relaxed mb-10 text-sm md:text-base">A location designed not around movement — but around returning.</p>
-            <div className="w-16 h-[2px] bg-[#800040]/40" />
+            <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-[#800040]/50 to-transparent" />
           </div>
         </div>
       </div>
